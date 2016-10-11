@@ -56,7 +56,7 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 running = True
 
-filename = 'plus1.wav' #input('Enter a relative filepath of a .wav file to visualize:\n')
+filename = 'data/easy.wav' 
 
 
 with open(filename, 'rb') as f:
@@ -87,7 +87,7 @@ with open(filename, 'rb') as f:
 
     visualizer = Visualizer(BANDS, FREQ_HIGH, FREQ_LOW) 
 
-    startTime = time.clock()
+    startTime = time.perf_counter()
 
     while running:
 
@@ -96,7 +96,7 @@ with open(filename, 'rb') as f:
                 running = False
 
         screen.fill((0,0,0))
-        goneTime = time.clock() - startTime
+        goneTime = time.perf_counter() - startTime
         offset = 44 + int(fmt_byteRate * goneTime)
         if offset & 1:
             offset += 1
