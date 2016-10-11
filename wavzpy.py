@@ -7,7 +7,7 @@ SCALE = HEIGHT / 2.5 / 32768
 
 DATA_SIZE = 2048
 
-filename = 'plus1.wav'
+filename = 'data/dustsucker.wav'
 
 goneTime = 0
 startTime = 0
@@ -40,7 +40,7 @@ with open(filename, 'rb') as f:
 
 
 
-    if not fmt_audioFormat:
+    if not fmt_audioFormat == 1:
     	print('Compression format not supported')
     	f.close()
     	running = False
@@ -48,50 +48,48 @@ with open(filename, 'rb') as f:
     pygame.mixer.music.load(filename)
     pygame.mixer.music.play()
 
-    startTime = time.clock()
+    startTime = time.perf_counter()
 
     while running:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP:
-                DATA_SIZE = min(16384, DATA_SIZE * 2)
+                    DATA_SIZE = min(16384, DATA_SIZE * 2)
                 elif event.key == pygame.K_DOWN:
-                DATA_SIZE = max(128, DATA_SIZE // 2)
+                    DATA_SIZE = max(128, DATA_SIZE // 2)
                 elif event.key == pygame.K_SPACE:
-                pygame.mixer.music.stop()
-                pygame.mixer.music.play()
-                startTime = time.clock()
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.play()
+                    startTime = time.perf_counter()
 
-    	screen.fill((0,0,0))
-        goneTime = time.clock() - startTime
+        goneTime = time.perf_counter() - startTime
         offset = 44 + int(fmt_byteRate * goneTime)
+        f.seek(offset + (offset & 1))
 
-    	f.seek(offset + (offset & 1))
-
-    	points = []
+        points = []
         for i in range(DATA_SIZE):
 
             data = int.from_bytes(f.read(fmt_bitsPerSample // 8), byteorder='little')
 
             if data < 32768:
-                    data += 32768
-                    elif data > 32768:
-                    data -= 32768
+                data += 32768
+            elif data > 32768:
+                data -= 32768
 
             x = (i / DATA_SIZE) * WIDTH
-                    y = (data + 32768/2) * SCALE  
-                    points.append((int(x),int(y)))
+            y = (data + 32768/2) * SCALE  
+            points.append((int(x),int(y)))
 
-    	lines = []
-            for x in range(WIDTH):
+        lines = []
+        for x in range(WIDTH):
             lines.append(points[DATA_SIZE * x // WIDTH])
 
-    	pygame.draw.lines(screen, (255,255,255), False, lines)
+        screen.fill((0,0,0))
+        pygame.draw.lines(screen, (255,255,255), False, lines)
 
+        pygame.display.flip()
+        clock.tick(60)
 
-    	pygame.display.flip()
-            clock.tick(60)
-            f.close()
+    f.close()
