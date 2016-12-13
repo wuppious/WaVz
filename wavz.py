@@ -22,6 +22,7 @@ running = True
 
 with open(filename, 'rb') as f:
 
+    # Read RIFF related data
     RIFF_chunkID        = int.from_bytes(f.read(4), byteorder='big')
     RIFF_chunkSize      = int.from_bytes(f.read(4), byteorder='little')
     RIFF_format         = int.from_bytes(f.read(4), byteorder='big')
@@ -64,6 +65,7 @@ with open(filename, 'rb') as f:
                     pygame.mixer.music.play()
                     startTime = time.perf_counter()
 
+        # Set offset to the right position timewise
         goneTime = time.perf_counter() - startTime
         offset = 44 + int(fmt_byteRate * goneTime)
         f.seek(offset + (offset & 1))
@@ -73,6 +75,7 @@ with open(filename, 'rb') as f:
 
             data = int.from_bytes(f.read(fmt_bitsPerSample // 8), byteorder='little')
 
+            # Center our data
             if data < 32768:
                 data += 32768
             elif data > 32768:
